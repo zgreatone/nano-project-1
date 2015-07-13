@@ -37,16 +37,17 @@ public class ArtistFragment extends Fragment {
 
     private ArrayAdapter<Artist> mArtistAdapter;
 
+    private ArrayList<Artist> artistResult = new ArrayList<>();
 
     public ArtistFragment() {
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.artist_fragment, container, false);
 
-        final ArrayList<Artist> artistResult = new ArrayList<>();
 
         mArtistAdapter = new ArrayAdapter<Artist>(
                 // the context
@@ -152,15 +153,20 @@ public class ArtistFragment extends Fragment {
         protected Artist[] doInBackground(String... params) {
             SpotifyApi api = new SpotifyApi();
             SpotifyService spotify = api.getService();
-            ArtistsPager results = spotify.searchArtists(params[0]);
+            Artist[] resultStrs;
+            try {
+                ArtistsPager results = spotify.searchArtists(params[0]);
 
-            Pager<Artist> artistPager = results.artists;
+                Pager<Artist> artistPager = results.artists;
 
-            Artist[] resultStrs = new Artist[artistPager.items.size()];
-            int index = 0;
-            for (Artist artist : artistPager.items) {
-                resultStrs[index] = artist;
-                index++;
+                resultStrs = new Artist[artistPager.items.size()];
+                int index = 0;
+                for (Artist artist : artistPager.items) {
+                    resultStrs[index] = artist;
+                    index++;
+                }
+            } catch (Exception e) {
+                resultStrs = new Artist[0];
             }
 
             return resultStrs;
@@ -175,10 +181,13 @@ public class ArtistFragment extends Fragment {
                     Toast toast = Toast.makeText(getActivity(), "artist not found try again", Toast.LENGTH_SHORT);
                     toast.show();
                 }
+                artistResult.clear();
                 mArtistAdapter.clear();
                 for (Artist artist : result) {
-                    mArtistAdapter.add(artist);
+                    //mArtistAdapter.add(artist);
+                    artistResult.add(artist);
                 }
+                mArtistAdapter.addAll(artistResult);
             }
         }
     }
