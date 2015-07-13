@@ -37,9 +37,30 @@ public class ArtistFragment extends Fragment {
 
     private ArrayAdapter<Artist> mArtistAdapter;
 
-    private ArrayList<Artist> artistResult = new ArrayList<>();
+    private ArrayList<Artist> artistResult;
 
     public ArtistFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedinstanceSate) {
+        super.onCreate(savedinstanceSate);
+        setHasOptionsMenu(true);
+        setRetainInstance(true);
+        if (savedinstanceSate != null) {
+        } else {
+            artistResult = new ArrayList<>();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
 
@@ -130,16 +151,6 @@ public class ArtistFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
-        final EditText searchBox = (EditText) getActivity().findViewById(R.id.search_input);
-        if (searchBox != null) {
-            String searchText = searchBox.getText().toString();
-            if (!"".equalsIgnoreCase(searchText)) {
-                searchArtist(searchText);
-            } else {
-                Log.d(LOG_TAG, "search text was empty");
-            }
-        }
     }
 
     private void searchArtist(String searchText) {

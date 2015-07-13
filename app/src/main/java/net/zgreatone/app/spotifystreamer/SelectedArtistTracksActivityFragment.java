@@ -37,7 +37,30 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
 
     private ArrayAdapter<Track> mTrackAdapter;
 
+    private ArrayList<Track> trackResult;
+
     public SelectedArtistTracksActivityFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedinstanceSate) {
+        super.onCreate(savedinstanceSate);
+        setHasOptionsMenu(true);
+        setRetainInstance(true);
+        if (savedinstanceSate != null) {
+        } else {
+            trackResult = new ArrayList<>();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -49,7 +72,6 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
             String artistName = intent.getStringExtra("ARTIST_NAME");
             String artistId = intent.getStringExtra("ARTIST_ID");
             String artistHref = intent.getStringExtra("ARTIST_HREF");
-            final ArrayList<Track> trackResult = new ArrayList<>();
 
 
             mTrackAdapter = new ArrayAdapter<Track>(
@@ -114,17 +136,6 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Intent intent = getActivity().getIntent();
-        if (intent != null && intent.hasExtra("ARTIST_ID")) {//start intent null block
-            String artistId = intent.getStringExtra("ARTIST_ID");
-            searchArtist(artistId);
-        } else {
-            Log.d(LOG_TAG, "artist id not specified");
-        }
-    }
 
     private void searchArtist(String artistId) {
         FetchArtistTrackTask fetchArtistTrackTask = new FetchArtistTrackTask();
@@ -137,24 +148,29 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
         protected Track[] doInBackground(String... params) {
             SpotifyApi api = new SpotifyApi();
             SpotifyService spotify = api.getService();
-            Map<String, Object> options = new HashMap<>();
-            options.put("country", "US");
-            Tracks tracks = spotify.getArtistTopTrack(params[0], options);
-
-            List<Track> trackList = tracks.tracks;
-
             Track[] top10Track;
-            int trackLength;
-            if (trackList.size() > 10) {
-                trackLength = 10;
-            } else {
-                trackLength = trackList.size();
-            }
+            try {
+                Map<String, Object> options = new HashMap<>();
+                options.put("country", "US");
+                Tracks tracks = spotify.getArtistTopTrack(params[0], options);
 
-            top10Track = new Track[trackLength];
+                List<Track> trackList = tracks.tracks;
 
-            for (int index = 0; index < trackLength; index++) {
-                top10Track[index] = trackList.get(index);
+
+                int trackLength;
+                if (trackList.size() > 10) {
+                    trackLength = 10;
+                } else {
+                    trackLength = trackList.size();
+                }
+
+                top10Track = new Track[trackLength];
+
+                for (int index = 0; index < trackLength; index++) {
+                    top10Track[index] = trackList.get(index);
+                }
+            } catch (Exception e) {
+                top10Track = new Track[0];
             }
 
             return top10Track;
@@ -168,10 +184,12 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
                     Toast toast = Toast.makeText(getActivity(), "no track found", Toast.LENGTH_SHORT);
                     toast.show();
                 }
+                trackResult.clear();
                 mTrackAdapter.clear();
                 for (Track track : result) {
-                    mTrackAdapter.add(track);
+                    trackResult.add(track);
                 }
+                mTrackAdapter.addAll(trackResult);
             }
         }
     }
