@@ -140,7 +140,6 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
             Map<String, Object> options = new HashMap<>();
             options.put("country", "US");
             Tracks tracks = spotify.getArtistTopTrack(params[0], options);
-//            Tracks tracks = spotify.getArtistTopTrack(params[0],);
 
             List<Track> trackList = tracks.tracks;
 
