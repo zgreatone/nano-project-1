@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -83,8 +84,11 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
                                         track.album.images.get(0).url
                                 ).into(imageView);
                     }
+                    // set the track album
+                    TextView albumTextView = (TextView) rowView.findViewById(R.id.list_item_album_textview);
+                    albumTextView.setText(track.album.name);
 
-                    // set the artist name
+                    // set the track name
                     TextView textView = (TextView) rowView.findViewById(R.id.list_item_track_textview);
                     textView.setText(track.name);
 
@@ -161,6 +165,10 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
         protected void onPostExecute(Track[] result) {
             Log.v(LOG_TAG, "post execute");
             if (result != null) {
+                if (result.length == 0) {
+                    Toast toast = Toast.makeText(getActivity(), "no track found", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
                 mTrackAdapter.clear();
                 for (Track track : result) {
                     mTrackAdapter.add(track);
