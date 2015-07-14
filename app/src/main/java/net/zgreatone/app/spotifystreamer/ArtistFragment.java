@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import net.zgreatone.app.spotifystreamer.util.SpotifyStreamerUtil;
+
 import java.util.ArrayList;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
@@ -39,15 +41,18 @@ public class ArtistFragment extends Fragment {
 
     private ArrayList<Artist> artistResult;
 
+    private String searchText;
+
     public ArtistFragment() {
     }
 
     @Override
-    public void onCreate(Bundle savedinstanceSate) {
-        super.onCreate(savedinstanceSate);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         setRetainInstance(true);
-        if (savedinstanceSate != null) {
+        if (savedInstanceState != null) {
+            searchText = savedInstanceState.getString("SEARCH_TEXT");
         } else {
             artistResult = new ArrayList<>();
         }
@@ -128,15 +133,18 @@ public class ArtistFragment extends Fragment {
         });
 
         final EditText searchBox = (EditText) rootView.findViewById(R.id.search_input);
+
         searchBox.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // if keydown and "enter" is pressed
                 if ((event.getAction() == KeyEvent.ACTION_DOWN)
                         && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    String searchText = searchBox.getText().toString();
+                    searchText = searchBox.getText().toString();
                     // display a floating message
+
                     searchArtist(searchText);
+
                     return true;
 
                 }
@@ -153,9 +161,15 @@ public class ArtistFragment extends Fragment {
         super.onStart();
     }
 
+
     private void searchArtist(String searchText) {
-        FetchArtistTask fetchArtistTask = new FetchArtistTask();
-        fetchArtistTask.execute(searchText);
+        if (SpotifyStreamerUtil.isNetworkAvailable(getActivity())) {
+            FetchArtistTask fetchArtistTask = new FetchArtistTask();
+            fetchArtistTask.execute(searchText);
+        } else {
+            Toast toast = Toast.makeText(getActivity(), "no network connection", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     public class FetchArtistTask extends AsyncTask<String, Void, Artist[]> {

@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import net.zgreatone.app.spotifystreamer.util.SpotifyStreamerUtil;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +55,8 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
         }
     }
 
+
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
@@ -69,9 +73,7 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         View rootView = inflater.inflate(R.layout.fragment_selected_artist_tracks, container, false);
         if (intent != null) {//start intent null block
-            String artistName = intent.getStringExtra("ARTIST_NAME");
             String artistId = intent.getStringExtra("ARTIST_ID");
-            String artistHref = intent.getStringExtra("ARTIST_HREF");
 
 
             mTrackAdapter = new ArrayAdapter<Track>(
@@ -131,6 +133,7 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
 
 
             searchArtist(artistId);
+
         }//end intent null block
         return rootView;
 
@@ -138,8 +141,13 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
 
 
     private void searchArtist(String artistId) {
-        FetchArtistTrackTask fetchArtistTrackTask = new FetchArtistTrackTask();
-        fetchArtistTrackTask.execute(artistId);
+        if (SpotifyStreamerUtil.isNetworkAvailable(getActivity())) {
+            FetchArtistTrackTask fetchArtistTrackTask = new FetchArtistTrackTask();
+            fetchArtistTrackTask.execute(artistId);
+        } else {
+            Toast toast = Toast.makeText(getActivity(), "no network connection", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     public class FetchArtistTrackTask extends AsyncTask<String, Void, Track[]> {
