@@ -96,15 +96,26 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
                     LayoutInflater inflater = (LayoutInflater) getActivity()
                             .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-                    // inflate the list item
-                    View rowView = inflater.inflate(R.layout.list_item_track, parent, false);
+                    ViewHolder holder;
+
+                    if(convertView == null) {
+                        convertView = inflater.inflate(R.layout.list_item_track, parent, false);
+                        holder = new ViewHolder();
+                        holder.trackName = (TextView) convertView.findViewById(R.id.list_item_track_textview);
+                        holder.albumName = (TextView) convertView.findViewById(R.id.list_item_album_textview);
+                        holder.albumImage = (ImageView) convertView.findViewById(R.id.list_item_track_image_view);
+                        convertView.setTag(holder);
+                    }
+                    else {
+                        holder = (ViewHolder) convertView.getTag();
+                    }
 
                     // get the current artist at position
                     Track track = mTrackAdapter.getItem(position);
 
                     // check to make sure artist has thumbnail image
                     if (track.album.images != null && track.album.images.size() > 0) {
-                        ImageView imageView = (ImageView) rowView.findViewById(R.id.list_item_track_image_view);
+                        ImageView imageView = holder.albumImage;
 
                         Picasso.with(getActivity())
                                 .load(
@@ -112,14 +123,14 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
                                 ).into(imageView);
                     }
                     // set the track album
-                    TextView albumTextView = (TextView) rowView.findViewById(R.id.list_item_album_textview);
+                    TextView albumTextView = holder.albumName;
                     albumTextView.setText(track.album.name);
 
                     // set the track name
-                    TextView textView = (TextView) rowView.findViewById(R.id.list_item_track_textview);
+                    TextView textView = holder.trackName;
                     textView.setText(track.name);
 
-                    return rowView;
+                    return convertView;
                 }
 
             };
@@ -204,5 +215,11 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
                 }
             }
         }
+    }
+
+    static class ViewHolder {
+        TextView trackName;
+        TextView albumName;
+        ImageView albumImage;
     }
 }

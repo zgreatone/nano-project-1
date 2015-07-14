@@ -92,15 +92,28 @@ public class ArtistFragment extends Fragment {
                 LayoutInflater inflater = (LayoutInflater) getActivity()
                         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-                // inflate the list item
-                View rowView = inflater.inflate(R.layout.list_item_artist, parent, false);
+                ViewHolder holder;
+
+                if(convertView == null) {
+                    convertView = inflater.inflate(R.layout.list_item_artist, parent, false);
+                    holder = new ViewHolder();
+                    holder.artistName = (TextView) convertView.findViewById(R.id.list_item_artist_textview);
+                    holder.artistImage = (ImageView) convertView.findViewById(R.id.list_item_artist_image_view);
+                    convertView.setTag(holder);
+                }
+                else {
+                    holder = (ViewHolder) convertView.getTag();
+                }
+
+
 
                 // get the current artist at position
                 Artist artist = mArtistAdapter.getItem(position);
 
                 // check to make sure artist has thumbnail image
                 if (artist.images != null && artist.images.size() > 0) {
-                    ImageView imageView = (ImageView) rowView.findViewById(R.id.list_item_artist_image_view);
+//                    ImageView imageView = (ImageView) rowView.findViewById(R.id.list_item_artist_image_view);
+                    ImageView imageView = (ImageView) holder.artistImage;
 
                     Picasso.with(getActivity())
                             .load(
@@ -109,10 +122,11 @@ public class ArtistFragment extends Fragment {
                 }
 
                 // set the artist name
-                TextView textView = (TextView) rowView.findViewById(R.id.list_item_artist_textview);
+//                TextView textView = (TextView) rowView.findViewById(R.id.list_item_artist_textview);
+                TextView textView = holder.artistName;
                 textView.setText(artist.name);
 
-                return rowView;
+                return convertView;
             }
 
         };
@@ -214,5 +228,11 @@ public class ArtistFragment extends Fragment {
                 }
             }
         }
+    }
+
+
+    static class ViewHolder {
+        TextView artistName;
+        ImageView artistImage;
     }
 }
