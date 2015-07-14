@@ -41,6 +41,8 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
 
     private ArrayList<Track> trackResult;
 
+    private String artistId;
+
     public SelectedArtistTracksActivityFragment() {
     }
 
@@ -49,12 +51,13 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
         super.onCreate(savedinstanceSate);
         setHasOptionsMenu(true);
         setRetainInstance(true);
+        Intent intent = getActivity().getIntent();
+        artistId = intent.getStringExtra("ARTIST_ID");
         if (savedinstanceSate != null) {
         } else {
             trackResult = new ArrayList<>();
         }
     }
-
 
 
     @Override
@@ -67,13 +70,13 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Intent intent = getActivity().getIntent();
+
         View rootView = inflater.inflate(R.layout.fragment_selected_artist_tracks, container, false);
-        if (intent != null) {//start intent null block
-            String artistId = intent.getStringExtra("ARTIST_ID");
+        if (artistId != null) {//start intent null block
 
 
             mTrackAdapter = new ArrayAdapter<Track>(
@@ -132,7 +135,9 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
             });
 
 
-            searchArtist(artistId);
+            if (trackResult.size() == 0) {
+                searchArtist(artistId);
+            }
 
         }//end intent null block
         return rootView;
@@ -197,7 +202,6 @@ public class SelectedArtistTracksActivityFragment extends Fragment {
                 for (Track track : result) {
                     trackResult.add(track);
                 }
-                mTrackAdapter.addAll(trackResult);
             }
         }
     }

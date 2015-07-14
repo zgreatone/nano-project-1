@@ -212,7 +212,6 @@ public class ArtistFragment extends Fragment {
                     //mArtistAdapter.add(artist);
                     artistResult.add(artist);
                 }
-                mArtistAdapter.addAll(artistResult);
             }
         }
     }
